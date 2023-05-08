@@ -16,9 +16,10 @@ class PhynewsSpider(scrapy.Spider):
         title = response.xpath('/html/body/main/div[1]/div[3]/div[2]/section/div/div[4]/article/h1/text()').get()
         brief = response.xpath('/html/body/main/div[1]/div[3]/div[2]/section/div/div[4]/article/div[2]/p[1]/text()[1]').get()
         body = response.xpath('/html/body/main/div[1]/div[3]/div[2]/section/div/div[4]/article/div[2]/p/text()').getall()
-
+        pdf = response.xpath('/html/body/main/div[1]/div[3]/div[2]/section/div/div[2]/ul/li[2]/a/@href')
         yield {
             'title' : title,
             'brief' : brief,
-            'body'  : body   
+            'body'  : body,
+            'pdf'   : pdf
         }
