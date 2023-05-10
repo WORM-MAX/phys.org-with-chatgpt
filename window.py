@@ -5,7 +5,7 @@ import json
 import subprocess  
 
 
-openai.api_key =
+openai.api_key = 
 
 def get_completion_from_messages(messages, model="gpt-3.5-turbo", temperature=0):
     response = openai.ChatCompletion.create(
@@ -39,10 +39,10 @@ class ChatApp:
         self.button1.grid(row=0, column=2, sticky='nsew', padx=1, pady=1)
 
 
-        #self.master.columnconfigure(0,weight=7)
-        #self.master.columnconfigure(1,weight=7)
-        #self.master.columnconfigure(2,weight=1)
-        #self.master.columnconfigure(3,weight=7)
+        self.master.columnconfigure(0,weight=7)
+        self.master.columnconfigure(1,weight=7)
+        self.master.columnconfigure(2,weight=1)
+        self.master.columnconfigure(3,weight=7)
         self.master.rowconfigure(0,weight=1)
         self.master.rowconfigure(1,weight=10)
         self.master.rowconfigure(2,weight=5)
@@ -86,7 +86,7 @@ class ChatApp:
         self.chat_frame = ttk.Frame(self.master, padding="10")
         self.chat_frame.grid(row=0, rowspan=3, column=3, sticky=(tk.E, tk.N, tk.S, tk.W))
 
-        self.chat_history = tk.Text(self.chat_frame, wrap=tk.WORD, state="disabled", width=50, height=50)
+        self.chat_history = tk.Text(self.chat_frame, wrap=tk.WORD, state="disabled", font=('Arial', 12), width=50, height=50)
         self.chat_history.grid(row=0, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
 
         self.scrollbar = ttk.Scrollbar(self.chat_frame, orient="vertical", command=self.chat_history.yview)
@@ -109,20 +109,11 @@ class ChatApp:
         self.chat_frame.rowconfigure(0, weight=1)
 
     def scrape(self):
-        #run scrape code 
-        self.chat_history.configure(state="normal")
-        self.chat_history.insert(tk.END, "waiting for scraping\n")
-        self.chat_history.yview(tk.END)
-        self.chat_history.configure(state="disabled")
-
+  
         cmd='request.exe'
-        #p=subprocess.Popen(cmd,shell=True)
-        #return_code=p.wait()  #wait for the end of subprocess
+        p=subprocess.Popen(cmd,shell=True)
+        return_code=p.wait()  #wait for the end of subprocess
 
-        self.chat_history.configure(state="normal")
-        self.chat_history.insert(tk.END, "Scrape completed")
-        self.chat_history.configure(state="disabled")
-        self.chat_history.yview(tk.END)
 
         #read json to get data from the website
         with open("data.json","r",encoding = "utf-8") as data:
@@ -205,7 +196,7 @@ For the body part, you should offer more detailed information with three sentenc
 # Create the Tkinter app and pass in the list
 root = tk.Tk()
 root.title("Chatbot")    # #窗口标题
-root.geometry("1200x800+50+20")   # #窗口位置后面是字母
+root.geometry("1400x800+50+20")   # #窗口位置后面是字母
 root.resizable(width=True, height=True)
 app = ChatApp(root,tips)
 root.mainloop()
