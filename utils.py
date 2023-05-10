@@ -5,50 +5,35 @@ import json
 import subprocess  
 
 
-openai.api_key = 
-
+#get response from opanai api
 def get_completion_from_messages(messages, model="gpt-3.5-turbo", temperature=0):
     response = openai.ChatCompletion.create(
         model=model,
         messages=messages,
         temperature=temperature, # this is the degree of randomness of the model's output
     )
-#     print(str(response.choices[0].message))
     return response.choices[0].message["content"]
 
+#GUI
 class ChatApp:
     def __init__(self, master, tips):
         self.master = master
         self.titles = []
         self.tips = tips
         self.indexs = [0]
-        self.var1 = tk.StringVar()
+        self.var1 = tk.StringVar()#Label teext on the top
         self.var1.set("Get the newest articles on phys.org/physics-news")
         self.createWidgets()
         
     def createWidgets(self):
-        #self.frame0 = ttk.Frame(self.master, padding="10")
-        #self.frame0.grid(row=1, column=0, columnspan=2, sticky=(tk.E, tk.N, tk.S, tk.W))
-        
         # Create a label and button
-        
         self.label1 = tk.Label(self.master, textvariable=self.var1, font=('Arial', 12),width=85,height=1)
         self.label1.grid(row=0,column=0,columnspan=2,sticky=(tk.E, tk.N, tk.S, tk.W), padx=1, pady=1)
         
         self.button1 = tk.Button(self.master, text="Scrape", command=self.scrape, font=('Arial', 12))
         self.button1.grid(row=0, column=2, sticky='nsew', padx=1, pady=1)
 
-
-        self.master.columnconfigure(0,weight=7)
-        self.master.columnconfigure(1,weight=7)
-        self.master.columnconfigure(2,weight=1)
-        self.master.columnconfigure(3,weight=7)
-        self.master.rowconfigure(0,weight=1)
-        self.master.rowconfigure(1,weight=10)
-        self.master.rowconfigure(2,weight=5)
-
-
-        # Create a Tkinter Treeview widget
+        # Create a Tkinter Treeview widget for titles
         self.tree = ttk.Treeview(self.master,height=17, columns=("Index", "Item"), show="headings")
         self.tree.grid(row=1, column=0, columnspan=3, sticky='nsew', padx=1, pady=1)
 
@@ -72,6 +57,7 @@ class ChatApp:
                                   font=('Arial', 12), width=10, height=10)
         self.listbox.grid(row=0, column=2,padx=1,pady=1)
 
+        #Button for starting bot
         self.button2 = tk.Button(self.frame1, text="Start", command=self.startbot,font=('Arial', 12), width=10, height=1)
         self.button2.grid(row=1,column=2,sticky=(tk.E, tk.N, tk.S),padx=1,pady=1)
 
@@ -103,17 +89,25 @@ class ChatApp:
 
         self.entry_field.bind("<Return>", self.send_message)
         self.entry_field.focus_set()
-
+        
+        #size configure
         self.chat_frame.columnconfigure(0, weight=2)
         self.chat_frame.columnconfigure(1, weight=1)
         self.chat_frame.rowconfigure(0, weight=1)
 
+        self.master.columnconfigure(0,weight=7)
+        self.master.columnconfigure(1,weight=7)
+        self.master.columnconfigure(2,weight=1)
+        self.master.columnconfigure(3,weight=7)
+        self.master.rowconfigure(0,weight=1)
+        self.master.rowconfigure(1,weight=10)
+        self.master.rowconfigure(2,weight=5)
+
     def scrape(self):
-  
+        #use cmd to run requests
         cmd='request.exe'
         p=subprocess.Popen(cmd,shell=True)
         return_code=p.wait()  #wait for the end of subprocess
-
 
         #read json to get data from the website
         with open("data.json","r",encoding = "utf-8") as data:
@@ -131,6 +125,7 @@ class ChatApp:
         self.var1.set("Already load")
 
     def startbot(self):
+        #get listbox value
         value = self.listbox.curselection()
         print(value)
         if value:
@@ -152,14 +147,12 @@ class ChatApp:
                 Please provide information asked by the user.
                 """} ]
             self.chat_history.configure(state="normal")
-            self.chat_history.insert(tk.END, f"If you want to download the article, \
-                                    here is the url:{self.pdf} \n")
-            re = get_completion_from_messages(self.context)
-            self.context.append({'role':'assistant', 'content':f"{re}"})
-            self.chat_history.insert(tk.END, f"AI: {re}\n")
+            self.chat_history.insert(tk.END, f"If you want to download the article\nHere is the url:{self.pdf} \n")
+            self.chat_history.insert(tk.END, "Please enter your requirements.\n")
             self.chat_history.configure(state="disabled")
             self.chat_history.yview(tk.END)
 
+    #get input and send response
     def send_message(self,event=None):
         user_input = self.user_text.get()
         if user_input:
@@ -170,33 +163,10 @@ class ChatApp:
             self.chat_history.configure(state="disabled")
             self.chat_history.yview(tk.END)
 
-    def collect_messages(self, input):
+    #collect chat history in one dict
+    def collect_messages(self, input): 
         self.context.append({'role':'user', 'content':f"{input}"})
         response = get_completion_from_messages(self.context) 
         self.context.append({'role':'assistant', 'content':f"{response}"})
         return response
 
-
-
-
-tips = """
-Choose one of your favourite articles listed above in the listbox right. \
-And chat with bot to get what your want.
-
-Here are some prompt examples.
-1. Tell me the structure and summarize key point.  \
-Use the bullet point to separate different parts. \
-For the body part, you should offer more detailed information with three sentences.
-2. Extract five keywords from the article.
-3.Summarize the background, research method and meaning with bullet point.
-"""
-
-
-
-# Create the Tkinter app and pass in the list
-root = tk.Tk()
-root.title("Chatbot")    # #窗口标题
-root.geometry("1400x800+50+20")   # #窗口位置后面是字母
-root.resizable(width=True, height=True)
-app = ChatApp(root,tips)
-root.mainloop()
